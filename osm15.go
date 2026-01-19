@@ -1,3 +1,14 @@
+/*
+ * Octra Go SDK - OSM-15 (Octra Structured Message)
+ *
+ * Copyright (c) 2026 Qiubit Team
+ * Licensed under the MIT License
+ *
+ * OSM-15 is a standardized protocol for secure structured data 
+ * signing (EIP-712 style) within the Octra ecosystem, 
+ * ensuring identity verification and data integrity.
+ */
+
 package osm15
 
 import (

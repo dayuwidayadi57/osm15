@@ -1,3 +1,13 @@
+/*
+ * Octra Go SDK - OSM-15 (Octra Structured Message)
+ *
+ * Copyright (c) 2026 Qiubit Team
+ * Licensed under the MIT License
+ *
+ * This module handles secure keystore management using 
+ * AES-256-GCM and Scrypt key derivation for the Octra network.
+ */
+
 package osm15
 
 import (
