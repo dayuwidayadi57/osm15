@@ -4,7 +4,7 @@ import (
 "encoding/base64"
 "fmt"
 "log"
-"tunnel/osm15"
+"github.com/dayuwidayadi57/osm15""
 )
 
 func main() {
