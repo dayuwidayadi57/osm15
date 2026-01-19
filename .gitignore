@@ -1,0 +1,19 @@
+# Binary files
+osm15-tool
+osm15-tool.exe
+
+# Wallet & Private Keys (SANGAT PENTING)
+wallet.json
+*.key
+*.pem
+
+# Transaction Folders
+pending_tx/
+signed_tx/
+archive/
+
+# Go dependencies & IDE
+vendor/
+.idea/
+.vscode/
+*.swp
