@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2026 Qiubit Team
  * Licensed under the MIT License
- * Version: 0.2.1
+ * Version: 0.2.2
  *
  * This module handles secure keystore management using 
  * AES-256-GCM and Scrypt key derivation for the Octra network.

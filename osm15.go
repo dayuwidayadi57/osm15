@@ -10,7 +10,7 @@
 //
 // (c) 2026 QiubitLabs Team. All rights reserved.
 // Licensed under the MIT License.
- * Version: 0.2.1
+ * Version: 0.2.2
 
 package osm15
 
