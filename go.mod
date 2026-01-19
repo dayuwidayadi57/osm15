@@ -4,6 +4,7 @@ go 1.25.1
 
 require (
 	github.com/fsnotify/fsnotify v1.9.0
+	github.com/mr-tron/base58 v1.2.0
 	golang.org/x/crypto v0.47.0
 )
 
