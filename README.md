@@ -82,6 +82,16 @@ If you are familiar with Ethereum's **EIP-712**, you will feel at home. OSM-15 b
 - **Human-readable signing**: Users see exactly what they sign.
 - **EIP-712 Style**: Familiar domain separation and recursive hashing.
 - **Enhanced Security**: Optimized for Ed25519 and SHA-256 (Octra Native).
+cat <<EOF > README.md
+# OSM15
+
+##  Octra Go SDK Standardized Protocol
+Professional Open Source Contributor Mode.
+
+## Versioning
+- Version: v0.2.2
+- Status: Stable
+- Date: 2026-01-19
 
 ## 📜 License
 (c) 2026 QiubitLabs Team. Licensed under the MIT License.
