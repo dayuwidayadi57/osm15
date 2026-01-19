@@ -60,24 +60,29 @@ func HashTypedData(data TypedData) ([]byte, error) {
 	if data.Types == nil {
 		data.Types = make(map[string][]TypedMember)
 	}
+	
 	data.Types["TypedDomain"] = []TypedMember{
 		{Name: "name", Type: "string"},
 		{Name: "version", Type: "string"},
 		{Name: "chainId", Type: "uint256"},
 	}
 
-	domainHash, err := hashStruct("TypedDomain", data.Domain.ToMap(), data.Types)
-	if err != nil { return nil, err }
+	domainHash, _ := hashStruct("TypedDomain", data.Domain.ToMap(), data.Types)
+	messageHash, _ := hashStruct(data.PrimaryType, data.Message, data.Types)
+
+	// Data binary yang akan di-sign (gabungan domain & message hash)
+	payloadBinary := append(domainHash, messageHash...)
 	
-	messageHash, err := hashStruct(data.PrimaryType, data.Message, data.Types)
-	if err != nil { return nil, err }
+	const TypedPrefix = "\x19Octra Typed Data:"
+	
+	//  (\nLength\n)
+	signingBody := fmt.Sprintf("%s\n%d\n%s", 
+		TypedPrefix, 
+		len(payloadBinary), 
+		string(payloadBinary),
+	)
 
-	var buf bytes.Buffer
-	buf.Write([]byte("\x19Octra Typed Data\n"))
-	buf.Write(domainHash)
-	buf.Write(messageHash)
-
-	hash := sha256.Sum256(buf.Bytes())
+	hash := sha256.Sum256([]byte(signingBody))
 	return hash[:], nil
 }
 
@@ -224,3 +229,13 @@ func GetSignerAddress(data TypedData, signatureB64 string, publicKeyB64 string) 
 	pk, _ := base64.StdEncoding.DecodeString(publicKeyB64)
 	return PublicKeyToAddress(pk), nil
 }
+
+func GetSigningText(data TypedData) (string, error) {
+	domainHash, _ := hashStruct("TypedDomain", data.Domain.ToMap(), data.Types)
+	messageHash, _ := hashStruct(data.PrimaryType, data.Message, data.Types)
+	payloadBinary := append(domainHash, messageHash...)
+	
+	const TypedPrefix = "\x19Octra Typed Data:\n"
+	return fmt.Sprintf("%s%d\n%s", TypedPrefix, len(payloadBinary), string(payloadBinary)), nil
+}
+
