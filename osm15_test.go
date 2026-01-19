@@ -182,3 +182,33 @@ func TestOSM15_KeystoreFlow(t *testing.T) {
 
 	fmt.Println("[DEBUG] Keystore Security: PASSED")
 }
+
+func TestOSM15_CoverageBooster(t *testing.T) {
+    priv, pub, _ := GenerateKeypair()
+    data := TypedData{
+        Domain:      TypedDomain{Name: "Test", Version: "1", ChainID: 1},
+        Types:       map[string][]TypedMember{"Msg": {{Name: "contents", Type: "string"}}},
+        PrimaryType: "Msg",
+        Message:     map[string]interface{}{"contents": "Boost Coverage"},
+    }
+
+    // 1. Boost GetSigningText (dari 0.0% jadi 100%)
+    txt, err := GetSigningText(data)
+    if err != nil || txt == "" { t.Error("GetSigningText failed") }
+
+    // 2. Boost Sign & Verify (Nutup sisa coverage)
+    sig, _ := SignTypedData(data, priv)
+    
+    // 3. Boost GetSignerAddress & Error Handling
+    addr, err := GetSignerAddress(data, sig, pub)
+    if err != nil || addr == "" { t.Error("GetSignerAddress failed") }
+    
+    // Test error case untuk GetSignerAddress (Signature ngaco)
+    _, err = GetSignerAddress(data, "invalid_sig", pub)
+    if err == nil { t.Error("Should return error for invalid signature") }
+
+    // 4. Boost VerifyFromJSON (Nutup gap 75%)
+    jsonBytes, _ := ExportToJSON(data, sig)
+    valid, err := VerifyFromJSON(jsonBytes, pub)
+    if !valid || err != nil { t.Error("VerifyFromJSON failed") }
+}

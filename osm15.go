@@ -1,13 +1,15 @@
-/*
- * Octra Go SDK - OSM-15 (Octra Structured Message)
- *
- * Copyright (c) 2026 Qiubit Team
- * Licensed under the MIT License
- *
- * OSM-15 is a standardized protocol for secure structured data 
- * signing (EIP-712 style) within the Octra ecosystem, 
- * ensuring identity verification and data integrity.
- */
+// Package osm15 implements the Octra Structured Message Standard (OSM-15).
+//
+// OSM-15 is a high-performance signing standard for the Octra Network,
+// featuring recursive struct hashing, domain separation, and Ed25519 
+// signature schemes. It is designed to be human-readable and 
+// cryptographically secure, similar to Ethereum's EIP-712.
+//
+// Specification: https://github.com/dayuwidayadi57/osm15
+// Reference Implementation: Go 1.19+
+//
+// (c) 2026 QiubitLabs Team. All rights reserved.
+// Licensed under the MIT License.
 
 package osm15
 
@@ -61,6 +63,10 @@ func HashTypedData(data TypedData) ([]byte, error) {
 		data.Types = make(map[string][]TypedMember)
 	}
 	
+<<<<<<< HEAD
+=======
+	// WAJIB: Daftarkan tipe TypedDomain agar hashStruct bisa memproses field-nya
+>>>>>>> 2ac639c (Update via GoSmartPush v17.1 - 2026-01-19 14:47:02)
 	data.Types["TypedDomain"] = []TypedMember{
 		{Name: "name", Type: "string"},
 		{Name: "version", Type: "string"},
@@ -82,6 +88,20 @@ func HashTypedData(data TypedData) ([]byte, error) {
 		string(payloadBinary),
 	)
 
+<<<<<<< HEAD
+=======
+	payloadBinary := append(domainHash, messageHash...)
+	
+	const TypedPrefix = "\x19Octra Typed Data:\n"
+	
+	// Mengikuti standar OSM-1: Prefix + Length + \n + BinaryData
+	signingBody := fmt.Sprintf("%s%d\n%s", 
+		TypedPrefix, 
+		len(payloadBinary), 
+		string(payloadBinary),
+	)
+
+>>>>>>> 2ac639c (Update via GoSmartPush v17.1 - 2026-01-19 14:47:02)
 	hash := sha256.Sum256([]byte(signingBody))
 	return hash[:], nil
 }
@@ -239,3 +259,17 @@ func GetSigningText(data TypedData) (string, error) {
 	return fmt.Sprintf("%s%d\n%s", TypedPrefix, len(payloadBinary), string(payloadBinary)), nil
 }
 
+<<<<<<< HEAD
+=======
+func GenerateKeypair() (string, string, error) {
+    pub, priv, err := ed25519.GenerateKey(nil)
+    if err != nil {
+        return "", "", err
+    }
+    
+    privBase64 := base64.StdEncoding.EncodeToString(priv.Seed())
+    pubBase64 := base64.StdEncoding.EncodeToString(pub)
+    
+    return privBase64, pubBase64, nil
+}
+>>>>>>> 2ac639c (Update via GoSmartPush v17.1 - 2026-01-19 14:47:02)

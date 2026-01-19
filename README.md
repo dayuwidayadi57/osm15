@@ -1,111 +1,87 @@
-# Octra OSM-15 Toolchain
+# Octra Sign Message Standards - OSM-15
 
-A high-performance Go library and CLI for the Octra ecosystem, implementing the **OSM-15** (Octra Structured Message) standard. This tool enables identity creation, secure keystore management, and automated structured data signing.
+[![Network](https://img.shields.io/badge/Network-Octra-blueviolet)](https://octra.network)
+[![Protocol](https://img.shields.io/badge/Protocol-OSM--15-success)](https://github.com/dayuwidayadi57/osm15)
+[![Team](https://img.shields.io/badge/Developed%20By-QiubitLabs-blue)](https://github.com/QiubitLabs)
+[![Coverage](https://img.shields.io/badge/Coverage-90.9%25-brightgreen)](https://github.com/dayuwidayadi57/osm15)
+[![Status](https://img.shields.io/badge/Status-Stable-blue)](https://github.com/dayuwidayadi57/osm15)
 
-## Core Features
+A high-performance Go library implementing the **OSM-15** (Octra Structured Message) standard. Designed for secure, recursive, and domain-isolated data signing in the Octra ecosystem.
 
-* **Identity Generation**: Create Ed25519 keypairs and derive Octra addresses (`oct...`).
-* **Secure Keystore**: Encrypt private keys using AES-256-GCM and Scrypt (industry standard).
-* **OSM-15 Signing**: EIP-712 style structured data hashing with array and recursive type support.
-* **Batch & Watcher**: High-throughput processing for manual or automated signing workflows.
+## 🚀 Key Functions for Developers
 
----
-
-## Developer Guide: Using the Library
-
-If you are developing a Go application and want to integrate OSM-15, use the following patterns:
-
-### 1. Signing Structured Data
-Define your message structure and sign it using a private key.
-
+### 1. Identity & Address
+Convert Ed25519 public keys into the official Octra address format.
 ```go
-import "tunnel/osm15"
+// Convert public key bytes to "oct..." address
+address := osm15.PublicKeyToAddress(publicKeyBytes)
+```
 
-// 1. Define Data
+### 2. Signing Structured Data
+Sign complex messages with recursive type support.
+```go
 data := osm15.TypedData{
-    Domain: osm15.TypedDomain{
-        Name: "OctraPay",
-        Version: "1",
-        ChainID: 1,
-    },
+    Domain: osm15.TypedDomain{Name: "OctraPay", Version: "1", ChainID: 1},
     Types: map[string][]osm15.TypedMember{
-        "Transfer": {
-            {Name: "to", Type: "string"},
+        "Transaction": {
             {Name: "amount", Type: "uint256"},
+            {Name: "to", Type: "address"},
         },
     },
-    PrimaryType: "Transfer",
+    PrimaryType: "Transaction",
     Message: map[string]interface{}{
-        "to": "octGzrStfZE5ae...",
-        "amount": 1000,
+        "amount": 5000,
+        "to": "oct1abc...",
     },
 }
 
-// 2. Sign (using Base64 private key seed)
-signature, err := osm15.SignTypedData(data, "your-private-key-base64")
-
-// 3. Export to JSON for Network Transmission
-jsonPayload, _ := osm15.ExportToJSON(data, signature)
+// Returns Base64 signature
+signature, err := osm15.SignTypedData(data, privateKeyBase64)
 ```
 
-### 2. Wallet & Keystore Management
-Securely encrypt and decrypt keys within your application.
-
+### 3. Verification & Signer Recovery
+Verify if a signature is valid and recover the signer's address.
 ```go
-// Encrypt a key to Scrypt-protected JSON
-keystoreJSON, err := osm15.EncryptKey(privateKeyB64, "strong-password")
+// Boolean verification
+isValid, err := osm15.VerifyTypedData(data, signature, publicKeyBase64)
 
-// Decrypt a key from Keystore JSON
-privateKey, err := osm15.DecryptKey(keystoreJSON, "strong-password")
+// Get signer's Octra address directly from signature
+address, err := osm15.GetSignerAddress(data, signature, publicKeyBase64)
 ```
 
-### 3. Verification
-Verify signatures received from other nodes or users.
-
+### 4. JSON Export & Import
+Easily export the signed payload to JSON or verify directly from a JSON file.
 ```go
-isValid, err := osm15.VerifyTypedData(data, signature, publicKeyB64)
-// Or verify directly from JSON payload
-isValid, err := osm15.VerifyFromJSON(payloadJSON, publicKeyB64)
+// Export to formatted JSON
+jsonBytes, err := osm15.ExportToJSON(data, signature)
+
+// Verify directly from JSON payload
+isValid, err := osm15.VerifyFromJSON(jsonBytes, publicKeyBase64)
 ```
 
----
+### 5. Debugging Signing Text
+Get the raw string that is being hashed and signed (for debugging or hardware wallet display).
+```go
+rawText, err := osm15.GetSigningText(data)
+fmt.Println(rawText)
+```
 
-## Technical Specifications
+## ⚙️ Technical Specifications
+- **Hashing**: Recursive SHA-256 (EIP-712 Style)
+- **Signature**: Ed25519
+- **Prefix**: \x19Octra Typed Data:
+- **Encoding**: Base64 (Signature & Keys) / Base58 (Address)
 
-| Component | Technology | Description |
-| :--- | :--- | :--- |
-| **Signature** | Ed25519 | Edwards-curve Digital Signature Algorithm |
-| **Hash Standard** | SHA3-256 | High-security cryptographic hashing |
-| **KDF** | Scrypt | N=32768, R=8, P=1 (Memory-hard against ASIC) |
-| **Encryption** | AES-256-GCM | Authenticated encryption with associated data |
-| **Address** | Base58 | Octra Address format with `oct` prefix |
-
-
-
----
-
-## Installation & Build
-
+## 🛠 Installation
 ```bash
-# Install dependencies
-go get github.com/fsnotify/fsnotify
-go get github.com/mr-tron/base58
-go get golang.org/x/crypto/scrypt
-
-# Build CLI tool
-go build -o osm15-tool ./cmd/osm15/main.go
+go get [github.com/dayuwidayadi57/osm15](https://github.com/dayuwidayadi57/osm15)
 ```
 
-## CLI Usage
+## 💡 Why OSM-15?
+If you are familiar with Ethereum's **EIP-712**, you will feel at home. OSM-15 brings:
+- **Human-readable signing**: Users see exactly what they sign.
+- **EIP-712 Style**: Familiar domain separation and recursive hashing.
+- **Enhanced Security**: Optimized for Ed25519 and SHA-256 (Octra Native).
 
-| Command | Usage |
-| :--- | :--- |
-| **generate** | `./osm15-tool generate` |
-| **encrypt** | `./osm15-tool encrypt -key <KEY> -pass <PW> > wallet.json` |
-| **watch-sign**| `./osm15-tool watch-sign -wallet wallet.json -pass <PW>` |
-| **batch-sign**| `./osm15-tool batch-sign -in <DIR> -out <DIR> -wallet <KS> -pass <PW>` |
-
----
-
-## License
-Proprietary / Octra Network
+## 📜 License
+(c) 2026 QiubitLabs Team. Licensed under the MIT License.
